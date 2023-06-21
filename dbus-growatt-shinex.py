@@ -172,10 +172,31 @@ class DbusGrowattShineXService:
             self._dbusservice['/Ac/L1/Energy/Forward'] = ( meter_data['TotalGenerateEnergy'] / 3 )
             self._dbusservice['/Ac/L2/Energy/Forward'] = ( meter_data['TotalGenerateEnergy'] / 3 )
             self._dbusservice['/Ac/L3/Energy/Forward'] = ( meter_data['TotalGenerateEnergy'] / 3 )
+
+            if meter_data['TotalGenerateEnergy'] > 0:
+                 self._dbusservice['/Ac/L1/Current'] = meter_data['L1ThreePhaseGridOutputCurrent']
+                 self._dbusservice['/Ac/L1/Power'] = meter_data['L1ThreePhaseGridOutputPower']
+                 self._dbusservice['/Ac/L1/Voltage'] = meter_data['L1ThreePhaseGridVoltage']
+
+                 self._dbusservice['/Ac/L2/Current'] = meter_data['L2ThreePhaseGridOutputCurrent']
+                 self._dbusservice['/Ac/L2/Power'] = meter_data['L2ThreePhaseGridOutputPower']
+                 self._dbusservice['/Ac/L2/Voltage'] = meter_data['L2ThreePhaseGridVoltage']
+
+                 self._dbusservice['/Ac/L3/Current'] = meter_data['L3ThreePhaseGridOutputCurrent']
+                 self._dbusservice['/Ac/L3/Power'] = meter_data['L3ThreePhaseGridOutputPower']
+                 self._dbusservice['/Ac/L3/Voltage'] = meter_data['L3ThreePhaseGridVoltage']
+
         else:
-            self._dbusservice['/Ac/L1/Energy/Forward'] = meter_data['TotalGenerateEnergy']
-            self._dbusservice['/Ac/L2/Energy/Forward'] = 0
-            self._dbusservice['/Ac/L3/Energy/Forward'] = 0
+            for phase in ['L1', 'L2', 'L3']:
+                pre = '/Ac/' + phase
+         
+                if phase == pvinverter_phase:
+                     self._dbusservice[phase + '/Forward'] = meter_data['TotalGenerateEnergy']
+                     if meter_data['TotalGenerateEnergy'] > 0:
+                          self._dbusservice[phase + '/Current'] = meter_data['L1ThreePhaseGridOutputCurrent']
+                          self._dbusservice[phase + '/Power'] = meter_data['L1ThreePhaseGridOutputPower']
+                          self._dbusservice[phase + '/Voltage'] = meter_data['L1ThreePhaseGridVoltage']
+
 
         self._dbusservice['/Connected'] = meter_data['InverterStatus']
         self._dbusservice['/ErrorCode'] = 0
@@ -183,17 +204,6 @@ class DbusGrowattShineXService:
             self._dbusservice['/Ac/Energy/Forward'] = meter_data['TotalGenerateEnergy']
             self._dbusservice['/Ac/Power'] = meter_data['OutputPower']
 
-            self._dbusservice['/Ac/L1/Current'] = meter_data['L1ThreePhaseGridOutputCurrent']
-            self._dbusservice['/Ac/L1/Power'] = meter_data['L1ThreePhaseGridOutputPower']
-            self._dbusservice['/Ac/L1/Voltage'] = meter_data['L1ThreePhaseGridVoltage']
-
-            self._dbusservice['/Ac/L2/Current'] = meter_data['L2ThreePhaseGridOutputCurrent']
-            self._dbusservice['/Ac/L2/Power'] = meter_data['L2ThreePhaseGridOutputPower']
-            self._dbusservice['/Ac/L2/Voltage'] = meter_data['L2ThreePhaseGridVoltage']
-
-            self._dbusservice['/Ac/L3/Current'] = meter_data['L3ThreePhaseGridOutputCurrent']
-            self._dbusservice['/Ac/L3/Power'] = meter_data['L3ThreePhaseGridOutputPower']
-            self._dbusservice['/Ac/L3/Voltage'] = meter_data['L3ThreePhaseGridVoltage']
 
         #logging
         logging.debug("House Consumption (/Ac/Power): %s" % (self._dbusservice['/Ac/Power']))
